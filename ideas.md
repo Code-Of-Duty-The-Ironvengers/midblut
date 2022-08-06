@@ -45,7 +45,6 @@ GET /book/add -> Add a new book to the collection
 POST /book/add
 
 GET /book/:bookId/request
-POST /book/:bookId/request
 
 GET /settings
 GET /settings/update-user

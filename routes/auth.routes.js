@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const UserModel = require("../models/User.model");
 const isLoggedOut = require("../middleware/isLoggedOut.middleware");
 const isLoggedIn = require("../middleware/isLoggedIn.middleware");
+const bcrypting = require("../utils/bcrypting");
 
 const authRouter = express.Router();
 
@@ -82,9 +83,8 @@ authRouter.post("/register", isLoggedOut, (req, res) => {
       }
 
       // 1st - create something called a salt
-      const salt = bcrypt.genSaltSync(15);
 
-      const hashedPassword = bcrypt.hashSync(password, salt);
+      const hashedPassword = bcrypting(password);
 
       UserModel.create({
         email,
