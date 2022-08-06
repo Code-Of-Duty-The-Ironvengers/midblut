@@ -27,7 +27,8 @@
     "express-session": "^1.17.3",
     "hbs": "^4.2.0",
     "mongoose": "^6.4.7",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "zod": "^3.17.10"
   },
   "devDependencies": {
     "nodemon": "^2.0.19"

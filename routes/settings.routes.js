@@ -6,34 +6,60 @@ const {
   Types: { ObjectId },
 } = require("mongoose");
 const bcrypting = require("../utils/bcrypting");
+const { z } = require("zod");
 
 const settingsRouter = Router();
 
-settingsRouter.get("/", isLoggedIn, (req, res) => {
-  res.render("settings/home");
-});
-
-settingsRouter.get("/update-user", isLoggedIn, async (req, res) => {
-  // 123
-  // PersonInClassModel.findOne({countryOfOrigin: "Deutschland", countryOfResidence: "France"})
-  // PersonInClassModel.findById(123)
+async function checkIfUserExists(req, res, next) {
   const user = await UserModel.findById(req.session.userId);
-  // UserDocument || null
 
   if (!user) {
     return res.redirect("/");
   }
-  res.render("settings/update-user", { user });
+
+  req.user = user;
+
+  next();
+}
+
+// ------------------------- THIS HAPPENS IN EVERY ROUTE OF THIS ROUTER ----------------------------------- //
+settingsRouter.use(isLoggedIn);
+settingsRouter.use(checkIfUserExists);
+
+settingsRouter.get("/", (req, res) => {
+  res.render("settings/home");
 });
 
-settingsRouter.post("/update-user", isLoggedIn, async (req, res) => {
+settingsRouter.get("/update-user", async (req, res) => {
+  res.render("settings/update-user", { user: req.user });
+});
+
+const updateUserSchema = z.object({
+  username: z.string().min(4),
+  email: z.string().email(),
+});
+
+// const fakeBody = {
+//   username: "asldkjfhasdlfkjh",
+//   email: "coim@coim.com",
+// };
+
+// const parsedBody = updateUserSchema.safeParse(fakeBody);
+
+// console.log(parsedBody);
+
+settingsRouter.post("/update-user", async (req, res) => {
   const { username = "", email = "" } = req.body;
-  console.log(
-    await UserModel.findOne({
-      $or: [{ username }, { email }],
-      _id: { $ne: ObjectId(req.session.userId) },
-    })
-  );
+
+  // const parsedBody = updateUserSchema.safeParse(req.body);
+
+  // if (!parsedBody.success) {
+  //   return res.status(400).render("settings/update-user", {
+  //     errorMessage: parsedBody.error.errors.join(" "),
+  //   });
+  // }
+
+  // const {} = parsedBody.data;
 
   if (username.length < 4) {
     return res.status(400).render("settings/update-user", {
@@ -63,6 +89,7 @@ settingsRouter.post("/update-user", isLoggedIn, async (req, res) => {
     await UserModel.findByIdAndUpdate(req.session.userId, { username, email });
     return res.redirect("/");
   }
+
   UserModel.find({
     _id: {
       $nin: [ObjectId(req.session.userId)],
@@ -78,22 +105,12 @@ settingsRouter.post("/update-user", isLoggedIn, async (req, res) => {
   });
 });
 
-settingsRouter.get("/update-password", isLoggedIn, async (req, res) => {
-  const user = await UserModel.findById(req.session.userId);
-
-  if (!user) {
-    return res.redirect("/");
-  }
-
-  res.render("settings/update-password", { user });
+settingsRouter.get("/update-password", async (req, res) => {
+  res.render("settings/update-password", { user: req.user });
 });
 
-settingsRouter.post("/update-password", isLoggedIn, async (req, res) => {
-  const user = await UserModel.findById(req.session.userId);
-
-  if (!user) {
-    return res.redirect("/");
-  }
+settingsRouter.post("/update-password", async (req, res) => {
+  const { user } = req;
 
   const {
     currentPassword = "",
