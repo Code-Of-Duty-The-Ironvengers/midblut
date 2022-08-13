@@ -21,6 +21,7 @@ const UserSchema = new mongoose.Schema({
       ref: "book",
     },
   ],
+  profilePic: String,
   //   books: We look into this whenever we add relationships
 });
 

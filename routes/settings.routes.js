@@ -7,6 +7,7 @@ const {
 } = require("mongoose");
 const bcrypting = require("../utils/bcrypting");
 const { z } = require("zod");
+const uploadMiddleware = require("../middleware/cloudinary");
 
 const settingsRouter = Router();
 
@@ -153,5 +154,23 @@ settingsRouter.post("/update-password", async (req, res) => {
 
   res.redirect("/");
 });
+
+settingsRouter.get("/profile-pic", (req, res) => {
+  res.render("settings/profile-pic");
+});
+
+settingsRouter.post(
+  "/profile-pic",
+  isLoggedIn,
+  uploadMiddleware.single("orangotang"),
+  async (req, res) => {
+    console.log(req.file);
+    await UserModel.findByIdAndUpdate(req.session.userId, {
+      profilePic: req.file.path,
+    });
+
+    res.render("settings/profile-pic");
+  }
+);
 
 module.exports = settingsRouter;

@@ -23,8 +23,11 @@ function makesConfig(app) {
       }),
     })
   );
+
   app.use(express.static(path.join(__dirname, "..", "public")));
 
+  // check if user is logged in it adds to something called res.locals `isLoggedIn=true`
+  // this way, we dont always have to send on EVERY SINGLE response that the user is logged
   app.use((req, res, next) => {
     if (req.session.userId) {
       res.locals.isLoggedIn = true;

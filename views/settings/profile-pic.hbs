@@ -1,0 +1,14 @@
+<form
+  method="post"
+  action="/settings/profile-pic"
+  enctype="multipart/form-data"
+>
+  <input type="file" name="orangotang" />
+
+  <button type="submit">Submit Yo Image</button>
+</form>
+<div>
+  {{#if img}}
+    <img src="{{img}}" />
+  {{/if}}
+</div>

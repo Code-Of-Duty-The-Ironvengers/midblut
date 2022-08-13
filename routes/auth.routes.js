@@ -9,7 +9,8 @@ const bcrypting = require("../utils/bcrypting");
 const authRouter = express.Router();
 
 // /auth
-authRouter.get("/register", isLoggedOut, (req, res) => {
+authRouter.get("/register", (req, res) => {
+  res.render("auth/register");
   res.render("auth/register");
 });
 
